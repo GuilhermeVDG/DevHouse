@@ -5,6 +5,14 @@ import House from "../models/House";
 
 class ReserveController{
   
+  async index(req, res){
+    const { user_id } = req.headers;
+
+    const reserves = await Reserve.find({ user: user_id }).populate('house');
+    
+    return res.json(reserves);
+  }
+  
   async store(req, res){
     const { user_id } = req.headers;
     const { house_id } = req.params
@@ -17,7 +25,7 @@ class ReserveController{
 
     if(house.status !== true) return res.status(400).json({ error: 'Request unavailable.' });
 
-    if(String(user_id) === String(house.user)) return res.status(401).json({ error: 'Unauthorized reserve.' });
+    if(String(user._id) === String(house.user)) return res.status(401).json({ error: 'Unauthorized reserve.' });
 
     const reserve = await Reserve.create({
       user: user_id,
@@ -25,7 +33,7 @@ class ReserveController{
       date
     });
 
-    await (await reserve.populate('house')).populate('user');
+    await reserve.populate('house').populate('user').execPopulate();
 
     return res.json(reserve);
   }
