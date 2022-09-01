@@ -1,5 +1,8 @@
 import House from '../models/House';
 import User from '../models/User';
+import * as Yup from 'yup';
+
+
 class HouseController{
   async index(req, res){
     const { status } = req.query;
@@ -8,6 +11,13 @@ class HouseController{
   }
   
   async store(req, res){
+    const schena = Yup.object().shape({
+      description: Yup.string().required(),
+      price: Yup.number().required(),
+      location: Yup.string().required(),
+      status: Yup.boolean().required()
+    })
+
     const { filename } = req.file;
     const { description, price, location, status } = req.body;
     const { user_id } = req.headers;
